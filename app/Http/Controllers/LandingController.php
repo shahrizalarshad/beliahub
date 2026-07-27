@@ -19,6 +19,7 @@ class LandingController extends Controller
         $services = Service::query()
             ->where('is_active', true)
             ->orderBy('name')
+            ->limit(3)
             ->get()
             ->map(function (Service $service): array {
                 $price = (float) $service->price;

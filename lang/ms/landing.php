@@ -56,7 +56,7 @@ return [
         'subtitle' => 'Harga permulaan — katalog penuh dikemas kini oleh pentadbir. Deposit 50% diperlukan semasa tempahan.',
         'price_label' => 'Harga',
         'deposit_label' => 'Deposit (50%)',
-        'order_cta' => 'Tempah',
+        'order_cta' => 'Tempah Sekarang',
         'view_all' => 'Lihat Semua Perkhidmatan',
         'items' => [
             'website' => [

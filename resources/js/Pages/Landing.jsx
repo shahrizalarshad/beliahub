@@ -1,3 +1,4 @@
+import { BriefcaseIcon } from '@/Components/Icons';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { Head, Link } from '@inertiajs/react';
 
@@ -216,9 +217,12 @@ export default function Landing({
                         {services.map((service) => (
                             <article
                                 key={service.slug}
-                                className="flex flex-col rounded-2xl border border-slate-200 bg-slate-50 p-6 shadow-sm"
+                                className="flex flex-col rounded-2xl border border-slate-200 bg-slate-50 p-6 shadow-sm transition hover:shadow-md"
                             >
-                                <h3 className="text-xl font-semibold text-slate-900">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+                                    <BriefcaseIcon className="h-5 w-5" />
+                                </div>
+                                <h3 className="mt-4 text-xl font-semibold text-slate-900">
                                     {service.name}
                                 </h3>
                                 <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-600">
@@ -250,6 +254,14 @@ export default function Landing({
                                 </Link>
                             </article>
                         ))}
+                    </div>
+                    <div className="mt-10 text-center">
+                        <Link
+                            href={catalogHref}
+                            className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-700 transition hover:text-emerald-800"
+                        >
+                            {t.services.view_all} →
+                        </Link>
                     </div>
                 </div>
             </section>
