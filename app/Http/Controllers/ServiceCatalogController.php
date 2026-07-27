@@ -21,6 +21,7 @@ class ServiceCatalogController extends Controller
                 'slug' => $service->slug,
                 'name' => $service->name,
                 'description' => $service->description,
+                'order_instructions' => $service->order_instructions,
                 'price' => (float) $service->price,
                 'price_formatted' => 'RM'.number_format((float) $service->price, 2),
                 'deposit_formatted' => 'RM'.number_format((float) $service->price * 0.5, 2),

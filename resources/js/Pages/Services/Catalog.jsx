@@ -1,6 +1,7 @@
+import { BriefcaseIcon, SearchIcon } from '@/Components/Icons';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { Head, Link } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 const defaultT = {
     nav: {
@@ -38,6 +39,26 @@ const defaultT = {
     },
 };
 
+const sortOptions = [
+    { value: 'name', label: 'Nama (A-Z)' },
+    { value: 'price_asc', label: 'Harga: Rendah ke Tinggi' },
+    { value: 'price_desc', label: 'Harga: Tinggi ke Rendah' },
+];
+
+function sortServices(services, sortBy) {
+    const sorted = [...services];
+
+    if (sortBy === 'price_asc') {
+        return sorted.sort((a, b) => a.price - b.price);
+    }
+
+    if (sortBy === 'price_desc') {
+        return sorted.sort((a, b) => b.price - a.price);
+    }
+
+    return sorted.sort((a, b) => a.name.localeCompare(b.name));
+}
+
 function scrollToHash(hash) {
     if (!hash) {
         return;
@@ -53,6 +74,21 @@ export default function Catalog({ auth, services = [], translations }) {
     const orderHref = auth?.user ? route('orders.create') : route('register');
     const membershipHref = auth?.user ? route('dashboard') : route('register');
     const [activeSection, setActiveSection] = useState('servis');
+    const [search, setSearch] = useState('');
+    const [sortBy, setSortBy] = useState('name');
+
+    const visibleServices = useMemo(() => {
+        const query = search.trim().toLowerCase();
+        const filtered = query
+            ? services.filter(
+                  (service) =>
+                      service.name.toLowerCase().includes(query) ||
+                      service.description?.toLowerCase().includes(query),
+              )
+            : services;
+
+        return sortServices(filtered, sortBy);
+    }, [services, search, sortBy]);
 
     useEffect(() => {
         const syncHash = () => {
@@ -117,45 +153,106 @@ export default function Catalog({ auth, services = [], translations }) {
                             Tiada perkhidmatan aktif buat masa ini.
                         </p>
                     ) : (
-                        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                            {services.map((service) => (
-                                <article
-                                    key={service.id ?? service.slug}
-                                    className="flex flex-col rounded-2xl border border-slate-200 bg-slate-50 p-6 shadow-sm transition hover:shadow-md"
+                        <>
+                            <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                <div className="relative flex-1 sm:max-w-xs">
+                                    <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                                    <input
+                                        type="search"
+                                        value={search}
+                                        onChange={(e) =>
+                                            setSearch(e.target.value)
+                                        }
+                                        placeholder="Cari perkhidmatan..."
+                                        className="w-full rounded-lg border border-slate-300 py-2 pl-9 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                                    />
+                                </div>
+                                <select
+                                    value={sortBy}
+                                    onChange={(e) =>
+                                        setSortBy(e.target.value)
+                                    }
+                                    className="rounded-lg border border-slate-300 py-2 pl-3 pr-8 text-sm text-slate-700 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                                 >
-                                    <h3 className="text-xl font-semibold text-slate-900">
-                                        {service.name}
-                                    </h3>
-                                    <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-600">
-                                        {service.description}
-                                    </p>
-                                    <div className="mt-6 space-y-1 border-t border-slate-200 pt-4">
-                                        <p className="flex justify-between text-sm">
-                                            <span className="text-slate-500">
-                                                Harga
-                                            </span>
-                                            <span className="font-semibold text-slate-900">
-                                                {service.price_formatted}
-                                            </span>
-                                        </p>
-                                        <p className="flex justify-between text-sm">
-                                            <span className="text-slate-500">
-                                                Deposit (50%)
-                                            </span>
-                                            <span className="font-medium text-emerald-700">
-                                                {service.deposit_formatted}
-                                            </span>
-                                        </p>
-                                    </div>
-                                    <Link
-                                        href={orderHref}
-                                        className="mt-5 block rounded-lg bg-emerald-600 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-emerald-700"
-                                    >
-                                        Tempah Sekarang
-                                    </Link>
-                                </article>
-                            ))}
-                        </div>
+                                    {sortOptions.map((option) => (
+                                        <option
+                                            key={option.value}
+                                            value={option.value}
+                                        >
+                                            {option.label}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {visibleServices.length === 0 ? (
+                                <p className="py-12 text-center text-sm text-slate-500">
+                                    Tiada perkhidmatan sepadan dengan carian
+                                    &ldquo;{search}&rdquo;.
+                                </p>
+                            ) : (
+                                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                                    {visibleServices.map((service) => (
+                                        <article
+                                            key={service.id ?? service.slug}
+                                            className="flex flex-col rounded-2xl border border-slate-200 bg-slate-50 p-6 shadow-sm transition hover:shadow-md"
+                                        >
+                                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+                                                <BriefcaseIcon className="h-5 w-5" />
+                                            </div>
+                                            <h3 className="mt-4 text-xl font-semibold text-slate-900">
+                                                {service.name}
+                                            </h3>
+                                            <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-600">
+                                                {service.description}
+                                            </p>
+
+                                            {service.order_instructions && (
+                                                <details className="mt-3 rounded-lg border border-slate-200 bg-white open:pb-3">
+                                                    <summary className="cursor-pointer select-none px-3 py-2 text-xs font-medium text-slate-600 hover:text-emerald-700">
+                                                        Apa perlu disediakan?
+                                                    </summary>
+                                                    <p className="px-3 text-xs leading-relaxed text-slate-500">
+                                                        {
+                                                            service.order_instructions
+                                                        }
+                                                    </p>
+                                                </details>
+                                            )}
+
+                                            <div className="mt-6 space-y-1 border-t border-slate-200 pt-4">
+                                                <p className="flex justify-between text-sm">
+                                                    <span className="text-slate-500">
+                                                        Harga
+                                                    </span>
+                                                    <span className="font-semibold text-slate-900">
+                                                        {
+                                                            service.price_formatted
+                                                        }
+                                                    </span>
+                                                </p>
+                                                <p className="flex justify-between text-sm">
+                                                    <span className="text-slate-500">
+                                                        Deposit (50%)
+                                                    </span>
+                                                    <span className="font-medium text-emerald-700">
+                                                        {
+                                                            service.deposit_formatted
+                                                        }
+                                                    </span>
+                                                </p>
+                                            </div>
+                                            <Link
+                                                href={orderHref}
+                                                className="mt-5 block rounded-lg bg-emerald-600 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-emerald-700"
+                                            >
+                                                Tempah Sekarang
+                                            </Link>
+                                        </article>
+                                    ))}
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             </section>
