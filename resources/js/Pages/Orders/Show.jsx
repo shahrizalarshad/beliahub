@@ -1,6 +1,9 @@
+import ConfirmDialog from '@/Components/ConfirmDialog';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
+import MoneySummary from '@/Components/MoneySummary';
 import OrderStepper from '@/Components/OrderStepper';
+import PaymentInstructionCard from '@/Components/PaymentInstructionCard';
 import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import StatusBadge from '@/Components/StatusBadge';
@@ -119,30 +122,6 @@ export default function Show({
                                         <dt className="text-xs text-slate-500">Kuantiti</dt>
                                         <dd className="text-sm text-slate-900">{order.quantity}</dd>
                                     </div>
-                                    <div>
-                                        <dt className="text-xs text-slate-500">Jumlah</dt>
-                                        <dd className="text-sm font-semibold text-slate-900">
-                                            {order.total_formatted}
-                                        </dd>
-                                    </div>
-                                    <div>
-                                        <dt className="text-xs text-slate-500">Deposit</dt>
-                                        <dd className="text-sm text-emerald-700">
-                                            {order.deposit_formatted}
-                                        </dd>
-                                    </div>
-                                    <div>
-                                        <dt className="text-xs text-slate-500">Dibayar</dt>
-                                        <dd className="text-sm text-slate-900">
-                                            {order.paid_formatted ?? 'RM 0.00'}
-                                        </dd>
-                                    </div>
-                                    <div>
-                                        <dt className="text-xs text-slate-500">Baki</dt>
-                                        <dd className="text-sm font-semibold text-amber-700">
-                                            {order.balance_formatted ?? order.total_formatted}
-                                        </dd>
-                                    </div>
                                 </dl>
                                 {order.requirements && (
                                     <div className="mt-4 border-t border-slate-100 pt-4">
@@ -235,34 +214,17 @@ export default function Show({
                         </div>
 
                         <div className="space-y-4">
-                            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6">
-                                <h3 className="font-semibold text-emerald-900">
-                                    Maklumat Bayaran
-                                </h3>
-                                <dl className="mt-4 space-y-2 text-sm">
-                                    <div>
-                                        <dt className="text-emerald-700">Bank</dt>
-                                        <dd className="font-medium text-emerald-900">
-                                            {paymentInfo.bank_name ?? '—'}
-                                        </dd>
-                                    </div>
-                                    <div>
-                                        <dt className="text-emerald-700">No. Akaun</dt>
-                                        <dd className="font-mono font-medium text-emerald-900">
-                                            {paymentInfo.account_no ?? '—'}
-                                        </dd>
-                                    </div>
-                                    <div>
-                                        <dt className="text-emerald-700">Nama Akaun</dt>
-                                        <dd className="font-medium text-emerald-900">
-                                            {paymentInfo.account_name ?? '—'}
-                                        </dd>
-                                    </div>
-                                </dl>
-                                <p className="mt-4 text-xs text-emerald-800">
-                                    Sila buat deposit 50% dan muat naik bukti bayaran. Tempahan akan disahkan selepas pembayaran disemak.
-                                </p>
-                            </div>
+                            <MoneySummary
+                                total={order.total_formatted}
+                                deposit={order.deposit_formatted}
+                                paid={order.paid_formatted ?? 'RM 0.00'}
+                                balance={
+                                    order.balance_formatted ??
+                                    order.total_formatted
+                                }
+                            />
+
+                            <PaymentInstructionCard paymentInfo={paymentInfo} />
 
                             {canCancel && (
                                 <ConfirmDialog

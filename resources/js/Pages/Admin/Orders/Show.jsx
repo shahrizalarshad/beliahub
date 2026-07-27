@@ -1,6 +1,7 @@
 import ConfirmDialog from '@/Components/ConfirmDialog';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
+import MoneySummary from '@/Components/MoneySummary';
 import SelectInput from '@/Components/SelectInput';
 import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
@@ -244,18 +245,6 @@ export default function Show({
                                         <dd className="text-sm text-slate-900">{order.quantity}</dd>
                                     </div>
                                     <div>
-                                        <dt className="text-xs text-slate-500">Jumlah</dt>
-                                        <dd className="text-sm font-semibold text-slate-900">
-                                            {order.total_formatted}
-                                        </dd>
-                                    </div>
-                                    <div>
-                                        <dt className="text-xs text-slate-500">Deposit</dt>
-                                        <dd className="text-sm text-emerald-700">
-                                            {order.deposit_formatted}
-                                        </dd>
-                                    </div>
-                                    <div>
                                         <dt className="text-xs text-slate-500">Petugas</dt>
                                         <dd className="text-sm text-slate-900">
                                             {order.provider_name ?? 'Belum ditugaskan'}
@@ -302,6 +291,13 @@ export default function Show({
                         </div>
 
                         <div className="space-y-4">
+                            <MoneySummary
+                                total={order.total_formatted}
+                                deposit={order.deposit_formatted}
+                                paid={order.paid_formatted}
+                                balance={order.balance_formatted}
+                            />
+
                             {order.status === 'pending' && (
                                 <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
                                     <h3 className="font-semibold text-emerald-900">Tindakan</h3>

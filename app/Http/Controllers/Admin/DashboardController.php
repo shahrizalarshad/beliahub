@@ -31,6 +31,13 @@ class DashboardController extends Controller
             ->get()
             ->sum(fn (ServiceOrder $order) => $order->balanceDue());
 
+        $pendingConfirmation = ServiceOrder::query()->where('status', 'pending')->count();
+        $staleOrders = ServiceOrder::query()
+            ->where('status', 'pending')
+            ->get()
+            ->filter(fn (ServiceOrder $order) => $order->isStale())
+            ->count();
+
         return Inertia::render('Admin/Dashboard', [
             'stats' => [
                 'active_members' => $members,
@@ -41,6 +48,11 @@ class DashboardController extends Controller
                 'net_revenue_formatted' => 'RM'.number_format($gross - $payouts, 2),
                 'outstanding_balance_formatted' => 'RM'.number_format($outstanding, 2),
                 'active_orders' => $activeOrders,
+            ],
+            'actionQueue' => [
+                'pending_applications' => $pendingApps,
+                'pending_confirmation' => $pendingConfirmation,
+                'stale_orders' => $staleOrders,
             ],
             'charts' => $this->chartData(),
         ]);

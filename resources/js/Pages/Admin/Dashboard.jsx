@@ -1,3 +1,5 @@
+import ActionQueueCard from '@/Components/ActionQueueCard';
+import { ClipboardIcon, InboxIcon, UsersIcon } from '@/Components/Icons';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Head } from '@inertiajs/react';
 import {
@@ -54,7 +56,38 @@ function ChartCard({ title, children }) {
     );
 }
 
-export default function Dashboard({ stats = {}, charts = null }) {
+export default function Dashboard({ stats = {}, actionQueue = {}, charts = null }) {
+    const queueItems = [
+        {
+            key: 'pending_applications',
+            icon: UsersIcon,
+            title: 'Permohonan Keahlian',
+            count: actionQueue.pending_applications ?? 0,
+            description: 'Menunggu kelulusan pentadbir',
+            href: route('admin.users.index', { status: 'pending' }),
+            tone: 'blue',
+        },
+        {
+            key: 'pending_confirmation',
+            icon: InboxIcon,
+            title: 'Tempahan Baharu',
+            count: actionQueue.pending_confirmation ?? 0,
+            description: 'Perlu semak bukti bayaran & sahkan',
+            href: route('admin.orders.index', { status: 'pending' }),
+            tone: 'amber',
+        },
+        {
+            key: 'stale_orders',
+            icon: ClipboardIcon,
+            title: 'Tempahan Tertunggak',
+            count: actionQueue.stale_orders ?? 0,
+            description: 'Lebih 14 hari tanpa bayaran',
+            href: route('admin.orders.index', { status: 'pending' }),
+            tone: 'red',
+        },
+    ].filter((item) => item.count > 0);
+
+
     const cards = [
         {
             label: 'Ahli Aktif',
@@ -109,6 +142,19 @@ export default function Dashboard({ stats = {}, charts = null }) {
 
             <div className="py-8">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    {queueItems.length > 0 && (
+                        <div className="mb-8">
+                            <h3 className="mb-3 text-sm font-semibold text-slate-700">
+                                Tindakan Diperlukan
+                            </h3>
+                            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                                {queueItems.map((item) => (
+                                    <ActionQueueCard key={item.key} {...item} />
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                         {cards.map((card) => (
                             <KpiCard key={card.label} {...card} />
