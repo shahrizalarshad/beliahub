@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Enums\SequenceType;
+use App\Support\StorageDisk;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\ServiceOrder;
@@ -31,7 +32,7 @@ class InvoiceService
             'bank' => config('beliahub.bank'),
         ]);
 
-        Storage::disk($this->disk())->put($path, $pdf->output());
+        Storage::disk(StorageDisk::uploads())->put($path, $pdf->output());
 
         return Invoice::create([
             'service_order_id' => $order->id,
@@ -52,7 +53,7 @@ class InvoiceService
             'order' => $payment->order,
         ]);
 
-        Storage::disk($this->disk())->put($path, $pdf->output());
+        Storage::disk(StorageDisk::uploads())->put($path, $pdf->output());
 
         $payment->update(['receipt_path' => $path]);
 
@@ -61,13 +62,8 @@ class InvoiceService
 
     public function pdfContents(string $path): ?string
     {
-        $disk = Storage::disk($this->disk());
+        $disk = Storage::disk(StorageDisk::uploads());
 
         return $disk->exists($path) ? $disk->get($path) : null;
-    }
-
-    private function disk(): string
-    {
-        return config('filesystems.default') === 's3' ? 's3' : 'local';
     }
 }

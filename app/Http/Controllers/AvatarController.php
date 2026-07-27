@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Support\StorageDisk;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -29,8 +30,8 @@ class AvatarController extends Controller
         $file = $request->file('avatar');
         $path = "avatars/{$user->id}/".Str::uuid()->toString().'.'.$file->getClientOriginalExtension();
 
-        $disk = Storage::disk($this->disk());
-        $disk->put($path, file_get_contents($file->getRealPath()));
+        $disk = Storage::disk(StorageDisk::uploads());
+        $disk->put($path, $file->get());
 
         if ($user->avatar_path && $disk->exists($user->avatar_path)) {
             $disk->delete($user->avatar_path);
@@ -46,7 +47,7 @@ class AvatarController extends Controller
         $user = $request->user();
 
         if ($user->avatar_path) {
-            $disk = Storage::disk($this->disk());
+            $disk = Storage::disk(StorageDisk::uploads());
 
             if ($disk->exists($user->avatar_path)) {
                 $disk->delete($user->avatar_path);
@@ -62,11 +63,11 @@ class AvatarController extends Controller
     {
         abort_unless((bool) $user->avatar_path, 404);
 
-        $disk = Storage::disk($this->disk());
+        $disk = Storage::disk(StorageDisk::uploads());
 
         abort_unless($disk->exists($user->avatar_path), 404);
 
-        if ($this->disk() === 's3') {
+        if (StorageDisk::isRemote()) {
             return redirect()->away(
                 $disk->temporaryUrl($user->avatar_path, now()->addMinutes(60)),
             );
@@ -76,10 +77,5 @@ class AvatarController extends Controller
             // Path berubah setiap muat naik, jadi selamat dicache lama.
             'Cache-Control' => 'public, max-age=86400',
         ]);
-    }
-
-    private function disk(): string
-    {
-        return config('filesystems.default') === 's3' ? 's3' : 'local';
     }
 }

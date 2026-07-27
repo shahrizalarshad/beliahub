@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Enums\FileCategory;
+use App\Support\StorageDisk;
 use App\Models\OrderFile;
 use App\Models\ServiceOrder;
 use App\Models\User;
@@ -20,11 +21,11 @@ class UploadService
         UploadedFile $file,
         FileCategory $category,
     ): OrderFile {
-        $disk = $this->disk();
+        $disk = StorageDisk::uploads();
         $filename = Str::uuid()->toString().'.'.$file->getClientOriginalExtension();
         $path = "orders/{$order->id}/{$category->value}/{$filename}";
 
-        Storage::disk($disk)->put($path, file_get_contents($file->getRealPath()));
+        Storage::disk($disk)->put($path, $file->get());
 
         return OrderFile::create([
             'service_order_id' => $order->id,
@@ -39,13 +40,13 @@ class UploadService
 
     public function temporaryUrl(string $path, int $minutes = 30): ?string
     {
-        $disk = Storage::disk($this->disk());
+        $disk = Storage::disk(StorageDisk::uploads());
 
         if (! $disk->exists($path)) {
             return null;
         }
 
-        if ($this->disk() === 's3') {
+        if (StorageDisk::isRemote()) {
             return $disk->temporaryUrl($path, now()->addMinutes($minutes));
         }
 
@@ -53,10 +54,5 @@ class UploadService
         return route('files.download', [
             'path' => rtrim(strtr(base64_encode($path), '+/', '-_'), '='),
         ]);
-    }
-
-    private function disk(): string
-    {
-        return config('filesystems.default') === 's3' ? 's3' : 'local';
     }
 }
