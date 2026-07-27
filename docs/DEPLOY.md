@@ -16,8 +16,9 @@ Deploy target: **Vercel** (serverless PHP) + **Aiven MySQL** + **Cloudflare R2**
 
 1. Cipta perkhidmatan **MySQL 8** di Aiven.
 2. Catat: `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`.
-3. Muat turun sijil SSL CA Aiven → simpan sebagai secret `MYSQL_ATTR_SSL_CA`.
-4. Jalankan migrasi pertama kali (lihat §6).
+3. Muat turun sijil SSL CA Aiven → simpan sebagai `database/certs/aiven-ca.pem` dalam repo (fail ini **sijil awam**, selamat untuk commit — bukan kunci peribadi).
+4. Set env `MYSQL_ATTR_SSL_CA=database/certs/aiven-ca.pem` — nilainya ialah **laluan relatif fail**, bukan kandungan sijil. Kod (`config/database.php`) buat `base_path($ca)` untuk resolve laluan ini kepada laluan penuh.
+5. Jalankan migrasi pertama kali (lihat §6).
 
 ## 3. Sediakan Cloudflare R2
 
@@ -37,16 +38,27 @@ AWS_USE_PATH_STYLE_ENDPOINT=true
 
 ## 4. Sediakan Brevo SMTP
 
+1. Daftar / log masuk [Brevo](https://www.brevo.com).
+2. **Senders & IP** → tambah & sahkan **sender email** (cth. `noreply@domain-anda.com`).
+3. **Settings → SMTP & API** → tab **SMTP** → **Generate new SMTP key**.
+4. Catat:
+   - **SMTP Login** (format `xxxx@smtp-brevo.com`) → `MAIL_USERNAME`
+   - **SMTP Key** → `MAIL_PASSWORD` *(bukan API key, bukan password akaun)*
+
 ```
 MAIL_MAILER=smtp
+MAIL_SCHEME=null
 MAIL_HOST=smtp-relay.brevo.com
 MAIL_PORT=587
-MAIL_USERNAME=<brevo_login>
-MAIL_PASSWORD=<brevo_smtp_key>
-MAIL_ENCRYPTION=tls
-MAIL_FROM_ADDRESS=noreply@domain-anda.com
-MAIL_FROM_NAME=Belia Hub
+MAIL_USERNAME=<smtp_login@smtp-brevo.com>
+MAIL_PASSWORD=<smtp_key>
+MAIL_FROM_ADDRESS=<sender_yang_disahkan>
+MAIL_FROM_NAME="Belia Hub"
 ```
+
+> **Penting:** `MAIL_USERNAME` ialah **SMTP Login** dari Brevo — **bukan** email biasa anda. `MAIL_FROM_ADDRESS` mesti sender yang **disahkan** dalam Brevo.
+
+E-mel yang dihantar app: pengesahan akaun, kelulusan keahlian, notifikasi tempahan.
 
 ## 5. Import Projek ke Vercel
 
@@ -79,7 +91,7 @@ DB_PORT=3306
 DB_DATABASE=<db_name>
 DB_USERNAME=<db_user>
 DB_PASSWORD=<db_password>
-MYSQL_ATTR_SSL_CA=<ca_cert_content>
+MYSQL_ATTR_SSL_CA=database/certs/aiven-ca.pem
 
 SESSION_DRIVER=database
 SESSION_LIFETIME=120
@@ -133,7 +145,7 @@ Sediakan GitHub **Environment** bernama `production` dengan secrets:
 | `DB_DATABASE` | Nama DB |
 | `DB_USERNAME` | User DB |
 | `DB_PASSWORD` | Password DB |
-| `MYSQL_ATTR_SSL_CA` | Sijil SSL Aiven |
+| `MYSQL_ATTR_SSL_CA` | `database/certs/aiven-ca.pem` — **laluan relatif**, bukan kandungan sijil (fail sudah wujud dalam repo) |
 
 ### Pilihan B — Manual (local)
 
@@ -196,3 +208,6 @@ push main → tambahan:
 
 **Asset CSS/JS tidak load**
 → Pastikan `npm run build` berjaya; semak `/build/assets/` accessible.
+
+**Job "Migrate Production DB" gagal (SSLnya)**
+→ Semak secret `MYSQL_ATTR_SSL_CA` dalam GitHub Environment `production` — nilainya **mesti** `database/certs/aiven-ca.pem` (laluan relatif fail yang sudah wujud dalam repo), **bukan** kandungan sijil PEM. `config/database.php` buat `base_path($ca)`, jadi jika secret diisi dengan kandungan sijil sebenar, laluan yang terhasil tidak sah dan sambungan SSL gagal.
