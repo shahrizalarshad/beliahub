@@ -25,6 +25,13 @@ return [
         'cta_order' => 'Order Sekarang',
         'cta_membership' => 'Mohon Keahlian',
         'cta_dashboard' => 'Ke Papan Pemuka',
+        'cta_catalog' => 'Lihat Katalog',
+    ],
+
+    'stats' => [
+        'members' => 'Ahli Aktif',
+        'services' => 'Jenis Perkhidmatan',
+        'completed_orders' => 'Tempahan Selesai',
     ],
 
     'features' => [

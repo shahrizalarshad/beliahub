@@ -39,20 +39,39 @@ function FeatureIcon({ type }) {
     );
 }
 
+function formatStat(value) {
+    return value >= 50 ? `${Math.floor(value / 10) * 10}+` : `${value ?? 0}`;
+}
+
 export default function Landing({
     auth,
     services,
     translations: t,
     heroImageUrl = null,
     heroOverlay = 0.55,
+    stats = {},
 }) {
     const orderHref = auth?.user ? route('dashboard') : route('register');
     const membershipHref = auth?.user ? route('dashboard') : route('register');
+    const catalogHref = route('services.catalog');
 
     const features = [
         { key: 'marketplace', ...t.features.marketplace },
         { key: 'membership', ...t.features.membership },
         { key: 'events', ...t.features.events },
+    ];
+
+    // Bar statistik cuma bermakna sebagai bukti sosial selepas ada tempahan
+    // sebenar yang selesai — elak tunjuk "0 Tempahan Selesai" pada organisasi baharu.
+    const showStats = (stats.completed_orders ?? 0) > 0;
+
+    const statItems = [
+        { key: 'members', value: formatStat(stats.members) },
+        { key: 'services', value: formatStat(stats.services) },
+        {
+            key: 'completed_orders',
+            value: formatStat(stats.completed_orders),
+        },
     ];
 
     const hasHeroImage = Boolean(heroImageUrl);
@@ -102,7 +121,7 @@ export default function Landing({
                     <p className="mt-6 max-w-2xl text-lg leading-relaxed text-white/90 sm:text-xl">
                         {t.hero.subtitle}
                     </p>
-                    <div className="mt-10 flex flex-wrap gap-4">
+                    <div className="mt-10 flex flex-wrap items-center gap-4">
                         <Link
                             href={orderHref}
                             className="rounded-xl bg-white px-6 py-3 text-sm font-semibold text-emerald-700 shadow-lg transition hover:bg-emerald-50"
@@ -117,9 +136,38 @@ export default function Landing({
                         >
                             {t.hero.cta_membership}
                         </Link>
+                        <Link
+                            href={catalogHref}
+                            className="text-sm font-semibold text-white/90 underline decoration-white/40 underline-offset-4 transition hover:text-white hover:decoration-white"
+                        >
+                            {t.hero.cta_catalog} →
+                        </Link>
                     </div>
                 </div>
             </section>
+
+            {/* Stats — bukti sosial, hanya bermakna selepas ada tempahan selesai */}
+            {showStats && (
+                <section className="relative z-10 -mt-8 sm:-mt-12">
+                    <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+                        <div className="grid grid-cols-3 divide-x divide-slate-100 rounded-2xl border border-slate-200 bg-white shadow-xl">
+                            {statItems.map((item) => (
+                                <div
+                                    key={item.key}
+                                    className="px-3 py-5 text-center sm:py-6"
+                                >
+                                    <p className="text-2xl font-extrabold text-emerald-700 sm:text-3xl">
+                                        {item.value}
+                                    </p>
+                                    <p className="mt-1 text-xs font-medium text-slate-500 sm:text-sm">
+                                        {t.stats[item.key]}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            )}
 
             {/* Features */}
             <section className="py-16 sm:py-20">
