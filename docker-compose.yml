@@ -8,21 +8,12 @@ services:
     working_dir: /var/www/html
     volumes:
       - .:/var/www/html
-    environment:
-      APP_ENV: local
-      APP_DEBUG: "true"
-      DB_CONNECTION: mysql
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_DATABASE: ${DB_DATABASE:-beliahub}
-      DB_USERNAME: ${DB_USERNAME:-beliahub}
-      DB_PASSWORD: ${DB_PASSWORD:-secret}
-      MAIL_MAILER: smtp
-      MAIL_HOST: mailpit
-      MAIL_PORT: 1025
-      QUEUE_CONNECTION: sync
-      SESSION_DRIVER: database
-      CACHE_STORE: database
+    # Nota: konfigurasi app (APP_ENV, DB_*, SESSION_DRIVER, dll.) sengaja TIDAK
+    # diletakkan di sini — semuanya datang dari fail `.env` yang di-mount.
+    # Meletakkannya sebagai container env vars akan "mengatasi" nilai yang
+    # dipaksa oleh phpunit.xml (<env force="true">) semasa `php artisan test`,
+    # menyebabkan APP_ENV kekal "local" (bukan "testing") dan CSRF/session
+    # ujian gagal (419 / not authenticated) walaupun phpunit.xml betul.
     depends_on:
       mysql:
         condition: service_healthy
