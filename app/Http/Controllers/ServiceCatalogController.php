@@ -28,6 +28,7 @@ class ServiceCatalogController extends Controller
 
         return Inertia::render('Services/Catalog', [
             'services' => $services,
+            'translations' => __('landing'),
         ]);
     }
 }

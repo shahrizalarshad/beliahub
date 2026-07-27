@@ -14,18 +14,18 @@ export default function PublicLayout({ auth, t, children }) {
                     </Link>
 
                     <nav className="hidden items-center gap-8 md:flex">
-                        <a
-                            href="#servis"
+                        <Link
+                            href={`${route('services.catalog')}#servis`}
                             className="text-sm font-medium text-slate-600 transition hover:text-emerald-700"
                         >
                             {t.nav.services}
-                        </a>
-                        <a
-                            href="#keahlian"
+                        </Link>
+                        <Link
+                            href={`${route('services.catalog')}#keahlian`}
                             className="text-sm font-medium text-slate-600 transition hover:text-emerald-700"
                         >
                             {t.nav.membership}
-                        </a>
+                        </Link>
                     </nav>
 
                     <div className="flex items-center gap-2 sm:gap-3">
