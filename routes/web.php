@@ -19,6 +19,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderFileController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Provider\DashboardController as ProviderDashboardController;
 use App\Http\Controllers\Provider\EarningsController;
 use App\Http\Controllers\Provider\OrderController as ProviderOrderController;
 use App\Http\Controllers\ServiceCatalogController;
@@ -81,6 +82,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'active'
 });
 
 Route::prefix('provider')->name('provider.')->middleware(['auth', 'verified', 'active', 'role:superadmin,provider'])->group(function () {
+    Route::get('/', ProviderDashboardController::class)->name('dashboard');
     Route::get('/orders', [ProviderOrderController::class, 'index'])->name('orders.index');
     Route::post('/orders/{order}/complete', [ProviderOrderController::class, 'complete'])->name('orders.complete');
     Route::get('/earnings', [EarningsController::class, 'index'])->name('earnings.index');

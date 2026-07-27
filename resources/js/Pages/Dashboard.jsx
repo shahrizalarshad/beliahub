@@ -1,5 +1,6 @@
 import EmptyState from '@/Components/EmptyState';
 import { ShoppingBagIcon } from '@/Components/Icons';
+import MemberCard from '@/Components/MemberCard';
 import PageCard from '@/Components/PageCard';
 import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
@@ -8,33 +9,33 @@ import { Card, CardContent } from '@/Components/ui/card';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router } from '@inertiajs/react';
 
-function MembershipCard({ membership, canApplyMembership }) {
+function StatChip({ label, value }) {
+    return (
+        <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-center shadow-sm sm:text-left">
+            <p className="text-xl font-bold text-slate-900">{value}</p>
+            <p className="text-xs text-slate-500">{label}</p>
+        </div>
+    );
+}
+
+function MembershipCard({ membership, memberCard, canApplyMembership }) {
     const apply = () => router.post(route('membership.apply'));
 
     if (membership.is_member) {
         return (
-            <Card className="border-emerald-200 bg-emerald-50/50 shadow-none">
-                <CardContent className="flex flex-wrap items-center justify-between gap-4 pt-6">
-                    <div>
-                        <p className="text-sm font-medium text-emerald-800">
-                            Status Keahlian
-                        </p>
-                        <p className="mt-2 text-2xl font-bold text-emerald-900">
-                            Ahli Aktif
-                        </p>
-                        {membership.membership_id && (
-                            <p className="mt-1 font-mono text-sm text-emerald-700">
-                                {membership.membership_id}
-                            </p>
-                        )}
-                    </div>
-                    <PrimaryButton asChild>
-                        <Link href={route('member.card')}>
-                            Lihat Kad Ahli Digital
-                        </Link>
-                    </PrimaryButton>
-                </CardContent>
-            </Card>
+            <div className="space-y-3">
+                <div className="mx-auto w-full max-w-md">
+                    <MemberCard member={memberCard} />
+                </div>
+                <div className="text-center">
+                    <Link
+                        href={route('member.card')}
+                        className="text-sm font-semibold text-emerald-700 hover:text-emerald-800"
+                    >
+                        Lihat Kad Penuh &amp; Kod QR →
+                    </Link>
+                </div>
+            </div>
         );
     }
 
@@ -78,7 +79,9 @@ function MembershipCard({ membership, canApplyMembership }) {
 
 export default function Dashboard({
     membership = {},
+    memberCard = null,
     recentOrders = [],
+    stats = {},
     canApplyMembership = false,
 }) {
     return (
@@ -95,8 +98,24 @@ export default function Dashboard({
                 <div className="mx-auto max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
                     <MembershipCard
                         membership={membership}
+                        memberCard={memberCard}
                         canApplyMembership={canApplyMembership}
                     />
+
+                    <div className="grid grid-cols-3 gap-3">
+                        <StatChip
+                            label="Jumlah Tempahan"
+                            value={stats.total_orders ?? 0}
+                        />
+                        <StatChip
+                            label="Aktif"
+                            value={stats.active_orders ?? 0}
+                        />
+                        <StatChip
+                            label="Selesai"
+                            value={stats.completed_orders ?? 0}
+                        />
+                    </div>
 
                     <div className="flex flex-wrap items-center justify-between gap-4">
                         <h3 className="text-lg font-semibold text-foreground">

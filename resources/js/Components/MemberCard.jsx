@@ -1,7 +1,32 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import Avatar from '@/Components/Avatar';
 
-// Kad ahli digital bergaya kad fizikal (nisbah ~ID card).
+function ChipIcon() {
+    return (
+        <svg
+            viewBox="0 0 32 24"
+            className="h-5 w-7 text-amber-200/90"
+            fill="none"
+        >
+            <rect
+                x="0.5"
+                y="0.5"
+                width="31"
+                height="23"
+                rx="4"
+                fill="currentColor"
+                fillOpacity="0.35"
+                stroke="currentColor"
+            />
+            <line x1="0.5" y1="8" x2="31.5" y2="8" stroke="currentColor" />
+            <line x1="0.5" y1="16" x2="31.5" y2="16" stroke="currentColor" />
+            <line x1="11" y1="0.5" x2="11" y2="23.5" stroke="currentColor" />
+            <line x1="21" y1="0.5" x2="21" y2="23.5" stroke="currentColor" />
+        </svg>
+    );
+}
+
+// Kad ahli digital bergaya kad fizikal / wallet pass (nisbah ~ID card).
 export default function MemberCard({ member, qrSvg }) {
     return (
         <div className="relative w-full max-w-xl overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-700 via-emerald-600 to-teal-500 p-6 text-white shadow-2xl sm:p-8">
@@ -23,18 +48,23 @@ export default function MemberCard({ member, qrSvg }) {
                         </p>
                     </div>
                 </div>
-                <span
-                    className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                        member.is_active
-                            ? 'bg-white/20 text-white'
-                            : 'bg-red-500/80 text-white'
-                    }`}
-                >
-                    {member.is_active ? 'AKTIF' : 'TIDAK AKTIF'}
-                </span>
+                <div className="flex items-center gap-2">
+                    <ChipIcon />
+                    <span
+                        className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                            member.is_active
+                                ? 'bg-white/20 text-white'
+                                : 'bg-red-500/80 text-white'
+                        }`}
+                    >
+                        {member.is_active ? 'AKTIF' : 'TIDAK AKTIF'}
+                    </span>
+                </div>
             </div>
 
-            <div className="relative mt-8 flex items-end justify-between gap-6">
+            <div className="relative mt-6 border-t border-dashed border-white/25" />
+
+            <div className="relative mt-6 flex items-end justify-between gap-6">
                 <div className="min-w-0">
                     <div className="flex items-center gap-4">
                         <span className="shrink-0 rounded-2xl bg-white/20 p-1 backdrop-blur">

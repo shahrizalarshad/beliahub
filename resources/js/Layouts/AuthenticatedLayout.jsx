@@ -17,6 +17,7 @@ import { useState } from 'react';
 function navItemsFor(role) {
     if (role === 'provider') {
         return [
+            { route: 'provider.dashboard', label: 'Papan Pemuka' },
             { route: 'provider.orders.index', label: 'Tempahan Ditugaskan' },
             { route: 'provider.earnings.index', label: 'Pendapatan' },
         ];
