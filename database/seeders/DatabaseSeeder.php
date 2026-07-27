@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
             SkillSeeder::class,
             ServiceSeeder::class,
             SuperadminSeeder::class,
+            DemoUserSeeder::class,
         ]);
     }
 }
