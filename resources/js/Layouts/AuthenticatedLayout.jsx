@@ -20,6 +20,7 @@ function navItemsFor(role) {
             { route: 'provider.dashboard', label: 'Papan Pemuka' },
             { route: 'provider.orders.index', label: 'Tempahan Ditugaskan' },
             { route: 'provider.earnings.index', label: 'Pendapatan' },
+            { route: 'attendances.index', label: 'Kehadiran Saya' },
         ];
     }
 
@@ -31,9 +32,11 @@ function navItemsFor(role) {
 
     if (role === 'member') {
         items.push({ route: 'member.card', label: 'Kad Ahli' });
+        items.push({ route: 'attendances.index', label: 'Kehadiran Saya' });
     }
 
     if (role === 'superadmin') {
+        items.push({ route: 'attendances.index', label: 'Kehadiran Saya' });
         items.push({ route: 'admin.dashboard', label: 'Panel Admin' });
     }
 

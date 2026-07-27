@@ -44,6 +44,10 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
     Route::post('/membership/apply', [MembershipController::class, 'apply'])->name('membership.apply');
     Route::get('/kad-ahli', [MemberCardController::class, 'show'])->name('member.card');
 
+    Route::get('/kehadiran-saya', [AttendanceController::class, 'index'])
+        ->middleware('role:superadmin,provider,member')
+        ->name('attendances.index');
+
     Route::resource('orders', OrderController::class)->only(['index', 'create', 'store', 'show']);
     Route::post('orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
     Route::post('orders/{order}/files', [OrderFileController::class, 'store'])->name('orders.files.store');
