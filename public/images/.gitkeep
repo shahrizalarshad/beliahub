@@ -1,0 +1,3 @@
+# Place hero.jpg (or .webp/.png) here for the landing page background.
+# Then set LANDING_HERO_IMAGE=images/hero.jpg in .env
+# Or use a full URL: LANDING_HERO_IMAGE=https://...

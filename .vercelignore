@@ -1,0 +1,15 @@
+.git
+.github
+.cursor
+agent.md
+docker
+docs
+tests
+storage/logs
+storage/framework/cache
+storage/framework/sessions
+storage/framework/views
+node_modules
+.env
+.env.*
+!.env.production.example

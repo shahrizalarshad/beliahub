@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<title>Belia Hub — Panduan Memahami Sistem</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+    color: #1e293b; font-size: 11pt; line-height: 1.6; margin: 0;
+  }
+  .cover { border-bottom: 4px solid #0f766e; padding-bottom: 18px; margin-bottom: 26px; }
+  .cover h1 { font-size: 26pt; margin: 0 0 4px; color: #0f766e; letter-spacing: -0.5px; }
+  .cover .subtitle { font-size: 13pt; color: #475569; margin: 0 0 8px; }
+  .cover .meta { font-size: 9pt; color: #64748b; }
+  h2 {
+    font-size: 15pt; color: #0f766e; margin: 26px 0 10px;
+    border-bottom: 1.5px solid #ccfbf1; padding-bottom: 4px; page-break-after: avoid;
+  }
+  h2 .num {
+    display: inline-block; background: #0f766e; color: #fff; border-radius: 50%;
+    width: 24px; height: 24px; text-align: center; line-height: 24px;
+    font-size: 11pt; margin-right: 8px;
+  }
+  h3 { font-size: 11.5pt; color: #134e4a; margin: 14px 0 6px; page-break-after: avoid; }
+  p { margin: 6px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10pt; page-break-inside: avoid; }
+  th { background: #0f766e; color: #fff; text-align: left; padding: 7px 10px; font-weight: 600; }
+  td { border: 1px solid #e2e8f0; padding: 6px 10px; vertical-align: top; }
+  tr:nth-child(even) td { background: #f8fafc; }
+  ul, ol { margin: 6px 0; padding-left: 22px; }
+  li { margin: 4px 0; }
+  .tip {
+    background: #f0fdfa; border-left: 4px solid #0f766e; border-radius: 4px;
+    padding: 10px 14px; margin: 12px 0; page-break-inside: avoid;
+  }
+  .tip b { color: #0f766e; }
+  .steps { counter-reset: step; list-style: none; padding-left: 0; }
+  .steps li {
+    counter-increment: step; margin: 8px 0; padding-left: 38px; position: relative;
+  }
+  .steps li::before {
+    content: counter(step); position: absolute; left: 0; top: 1px;
+    background: #ccfbf1; color: #0f766e; font-weight: 700;
+    width: 26px; height: 26px; border-radius: 50%; text-align: center; line-height: 26px;
+  }
+  .status-flow { text-align: center; margin: 14px 0; page-break-inside: avoid; }
+  .badge {
+    display: inline-block; padding: 6px 14px; border-radius: 20px;
+    font-weight: 600; font-size: 9.5pt; margin: 2px;
+  }
+  .b-pending { background: #fef9c3; color: #854d0e; }
+  .b-progress { background: #dbeafe; color: #1e40af; }
+  .b-done { background: #dcfce7; color: #166534; }
+  .b-cancel { background: #fee2e2; color: #991b1b; }
+  .arrow { color: #94a3b8; font-weight: 700; margin: 0 4px; }
+  .role-card {
+    border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 12px 16px;
+    margin: 10px 0; page-break-inside: avoid;
+  }
+  .role-card h4 { margin: 0 0 4px; color: #0f766e; font-size: 11.5pt; }
+  .role-card p { margin: 2px 0; font-size: 10.5pt; }
+  .pagebreak { page-break-before: always; }
+  .footer-note {
+    margin-top: 30px; font-size: 8.5pt; color: #94a3b8;
+    border-top: 1px solid #e2e8f0; padding-top: 8px;
+  }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Belia Hub</h1>
+  <p class="subtitle">Panduan Memahami Sistem — Untuk Semua Pengguna</p>
+  <p class="meta">Platform digital organisasi belia · Keahlian · Tempahan Servis · Event &amp; Kehadiran · Julai 2026</p>
+</div>
+
+<h2><span class="num">1</span>Apa Itu Belia Hub?</h2>
+<p>Belia Hub ialah sistem digital untuk organisasi belia yang menggabungkan <b>dua fungsi utama</b>:</p>
+<ul>
+  <li><b>Pengurusan keahlian</b> — daftar ahli, kad ID ahli digital, rekod kehadiran event.</li>
+  <li><b>Perkhidmatan (marketplace)</b> — sesiapa sahaja boleh menempah servis daripada organisasi (contoh: buat website, resume, poster, baju) dan hasil kerja dilaksanakan oleh ahli belia sendiri. Pendapatan masuk ke organisasi, dan petugas yang menyiapkan kerja dibayar upah.</li>
+</ul>
+<div class="tip"><b>Ringkasnya:</b> organisasi dapat jana pendapatan, ahli belia dapat peluang kerja dan upah, pelanggan dapat servis berkualiti pada harga berpatutan.</div>
+
+<h2><span class="num">2</span>Siapa Guna Sistem Ini?</h2>
+
+<div class="role-card">
+  <h4>Pelanggan (Client)</h4>
+  <p>Orang luar yang daftar untuk menempah servis. Boleh buat tempahan, hantar bahan rujukan, upload resit bayaran, berbual dengan petugas, dan jejak status tempahan. <b>Tiada</b> ID ahli dan tidak menyertai event.</p>
+</div>
+<div class="role-card">
+  <h4>Ahli (Member)</h4>
+  <p>Ahli organisasi yang telah diluluskan. Dapat <b>ID ahli rasmi</b> (contoh: BH-2026-0001), boleh tempah servis, hadir event dan scan QR kehadiran, serta letak kemahiran pada profil.</p>
+</div>
+<div class="role-card">
+  <h4>Petugas (Provider)</h4>
+  <p>Ahli yang dilantik untuk menyiapkan tempahan — apa jua jenis servis (digital atau fizikal). Terima tugasan, kemaskini status kerja, hantar hasil siap, dan <b>terima upah</b> yang direkodkan dalam sistem.</p>
+</div>
+<div class="role-card">
+  <h4>Admin (Superadmin)</h4>
+  <p>Pentadbir organisasi. Urus ahli &amp; kelulusan keahlian, senarai servis &amp; harga, tempahan, kewangan (bayaran masuk, upah, refund), event, dan lihat laporan keseluruhan.</p>
+</div>
+
+<h2><span class="num">3</span>Modul Pendaftaran &amp; Keahlian</h2>
+<p>Pendaftaran terbuka kepada sesiapa sahaja — percuma dan mudah:</p>
+<ol class="steps">
+  <li>Daftar dengan nama, emel, telefon dan kawasan. Sahkan emel anda.</li>
+  <li>Akaun anda bermula sebagai <b>Pelanggan</b> — sudah boleh menempah servis serta-merta.</li>
+  <li>Mahu jadi ahli organisasi? Tandakan <b>"Mohon jadi ahli"</b> semasa daftar, atau tekan butang mohon di dashboard bila-bila masa.</li>
+  <li>Admin menyemak dan meluluskan permohonan.</li>
+  <li>Setelah lulus — anda terima <b>ID ahli rasmi</b> (contoh: <b>BH-2026-0001</b>) dan emel aluan. Kini anda boleh menyertai event dan meletakkan kemahiran pada profil.</li>
+</ol>
+<div class="tip"><b>Kemahiran (Skill):</b> ahli boleh tandakan kemahiran pada profil — contohnya Web Design, Copywriting, Jahitan. Admin menggunakan maklumat ini untuk memilih petugas yang sesuai bagi setiap tempahan.</div>
+
+<div class="pagebreak"></div>
+
+<h2><span class="num">4</span>Modul Tempahan Servis</h2>
+<p>Senarai servis dan harga sentiasa dipaparkan di halaman utama — boleh dilihat tanpa login. Contoh servis permulaan:</p>
+<table>
+  <tr><th>Servis</th><th>Harga</th><th>Deposit (50%)</th></tr>
+  <tr><td>Website</td><td>RM300</td><td>RM150</td></tr>
+  <tr><td>Aplikasi / APK</td><td>RM150</td><td>RM75</td></tr>
+  <tr><td>Resume</td><td>RM50</td><td>RM25</td></tr>
+</table>
+<p>Admin boleh menambah servis baharu pada bila-bila masa (contoh: poster, baju) — dan tempahan menyokong <b>kuantiti</b> (contoh: 30 helai baju).</p>
+
+<h3>Cara menempah</h3>
+<ol class="steps">
+  <li>Pilih servis, nyatakan kuantiti dan keperluan anda (untuk barang fizikal: saiz, alamat penghantaran atau ambil sendiri).</li>
+  <li>Muat naik bahan rujukan jika ada (logo, contoh design, dokumen).</li>
+  <li>Bayar <b>deposit 50%</b> ke akaun bank organisasi (maklumat akaun dipaparkan pada halaman tempahan) dan muat naik resit bayaran.</li>
+  <li>Admin sahkan bayaran, keluarkan <b>invois rasmi</b> (PDF melalui emel) dan lantik petugas.</li>
+  <li>Berbual terus dengan petugas melalui <b>ruangan komen</b> pada tempahan — beri maklum balas, minta pembetulan.</li>
+  <li>Bila siap, hasil kerja dimuat naik dan anda dimaklumkan melalui emel. Jelaskan baki bayaran dan terima <b>resit rasmi</b>.</li>
+</ol>
+
+<h3>Status tempahan</h3>
+<div class="status-flow">
+  <span class="badge b-pending">Menunggu (Pending)</span><span class="arrow">→</span>
+  <span class="badge b-progress">Sedang Dibuat (In Progress)</span><span class="arrow">→</span>
+  <span class="badge b-done">Selesai (Completed)</span>
+  <br><span class="badge b-cancel">Dibatalkan (Cancelled)</span> <span style="font-size:9pt;color:#64748b;">— boleh berlaku sebelum selesai</span>
+</div>
+<div class="tip"><b>Bayaran balik (refund):</b> jika tempahan dibatalkan sebelum kerja bermula, deposit dipulangkan sepenuhnya. Jika kerja sudah bermula, jumlah pulangan ditentukan oleh admin.</div>
+
+<h2><span class="num">5</span>Modul Untuk Petugas</h2>
+<p>Petugas ialah ahli belia yang menyiapkan tempahan. Alur kerjanya:</p>
+<ol class="steps">
+  <li>Admin melantik anda kepada satu tempahan (berdasarkan kemahiran anda).</li>
+  <li>Semak keperluan pelanggan dan bahan rujukan; tanya soalan melalui ruangan komen.</li>
+  <li>Siapkan kerja, kemudian muat naik hasil — fail sebenar untuk servis digital, atau gambar bukti siap untuk barang fizikal.</li>
+  <li>Tandakan tempahan sebagai <b>Selesai</b>.</li>
+  <li>Selepas pelanggan menjelaskan bayaran penuh, organisasi membayar <b>upah</b> anda — direkodkan dalam sistem dan boleh disemak di halaman <b>"Pendapatan Saya"</b>.</li>
+</ol>
+
+<div class="pagebreak"></div>
+
+<h2><span class="num">6</span>Modul Event &amp; Kehadiran QR</h2>
+<p>Untuk ahli sahaja. Organisasi menganjurkan event (program, bengkel, perjumpaan) dan kehadiran direkod secara automatik:</p>
+<ol class="steps">
+  <li>Admin membuat event dengan tarikh, masa, lokasi dan bajet.</li>
+  <li>Semasa event, admin memaparkan <b>kod QR khas</b> di skrin.</li>
+  <li>Ahli scan QR dengan telefon → kehadiran terus direkodkan dengan masa scan.</li>
+</ol>
+<div class="tip"><b>Keselamatan:</b> kod QR bertukar setiap beberapa minit — screenshot yang dikongsi di WhatsApp tidak akan berfungsi. Setiap ahli hanya boleh scan sekali untuk setiap event, dan hanya dalam tempoh event berlangsung.</div>
+
+<h2><span class="num">7</span>Modul Untuk Admin</h2>
+<p>Admin mengurus keseluruhan sistem dari satu tempat:</p>
+<table>
+  <tr><th>Bahagian</th><th>Apa yang admin boleh buat</th></tr>
+  <tr><td>Ahli</td><td>Lulus/tolak permohonan keahlian, lantik petugas, cari ahli ikut kawasan atau kemahiran, nyahaktifkan akaun</td></tr>
+  <tr><td>Servis</td><td>Tambah / ubah / buang jenis servis dan harga pada bila-bila masa</td></tr>
+  <tr><td>Tempahan</td><td>Sahkan bayaran, lantik petugas, pantau status, batalkan tempahan bermasalah (tempahan lama tak berbayar ditanda "Tertunggak")</td></tr>
+  <tr><td>Kewangan</td><td>Rekod bayaran masuk (dengan resit auto), upah petugas, dan refund — semuanya dicatat dalam log audit</td></tr>
+  <tr><td>Event</td><td>Buat event, urus bajet, paparkan QR, lihat &amp; eksport senarai kehadiran</td></tr>
+  <tr><td>Dashboard</td><td>Lihat sekali pandang: jumlah ahli aktif, kutipan (RM), upah dibayar, pendapatan bersih, baki belum kutip, dan carta trend bulanan</td></tr>
+</table>
+
+<h2><span class="num">8</span>Soalan Lazim</h2>
+<table>
+  <tr><th>Soalan</th><th>Jawapan</th></tr>
+  <tr><td>Perlu jadi ahli untuk tempah servis?</td><td>Tidak. Sesiapa sahaja boleh daftar sebagai pelanggan dan terus menempah.</td></tr>
+  <tr><td>Macam mana nak bayar?</td><td>Pindahan bank / DuitNow ke akaun organisasi, kemudian muat naik resit. Admin akan sahkan.</td></tr>
+  <tr><td>Bila saya dapat ID ahli?</td><td>Selepas permohonan keahlian anda diluluskan oleh admin.</td></tr>
+  <tr><td>Harga servis berubah, tempahan saya terjejas?</td><td>Tidak. Harga dikunci pada masa anda menempah.</td></tr>
+  <tr><td>Data saya selamat?</td><td>Ya. Data peribadi dilindungi mengikut PDPA dan hanya dilihat oleh pihak yang berkenaan sahaja.</td></tr>
+  <tr><td>Petugas dibayar macam mana?</td><td>Pelanggan bayar kepada organisasi; selepas kerja siap dan bayaran penuh diterima, organisasi membayar upah petugas.</td></tr>
+</table>
+
+<p class="footer-note">Belia Hub — Panduan Memahami Sistem · Untuk penerangan teknikal, rujuk BeliaHub-Architecture-Report.pdf</p>
+
+</body>
+</html>

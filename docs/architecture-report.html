@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<title>Belia Hub — System Architecture Report</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+    color: #1a202c; font-size: 10.5pt; line-height: 1.55; margin: 0;
+  }
+  .cover {
+    border-bottom: 4px solid #0f766e; padding-bottom: 18px; margin-bottom: 28px;
+  }
+  .cover h1 { font-size: 26pt; margin: 0 0 4px; color: #0f766e; letter-spacing: -0.5px; }
+  .cover .subtitle { font-size: 13pt; color: #475569; margin: 0 0 10px; }
+  .cover .meta { font-size: 9pt; color: #64748b; }
+  h2 {
+    font-size: 14pt; color: #0f766e; border-bottom: 1.5px solid #ccfbf1;
+    padding-bottom: 4px; margin: 26px 0 10px; page-break-after: avoid;
+  }
+  h3 { font-size: 11.5pt; color: #134e4a; margin: 16px 0 6px; page-break-after: avoid; }
+  p { margin: 6px 0; }
+  table {
+    border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 9.5pt;
+    page-break-inside: avoid;
+  }
+  th { background: #0f766e; color: #fff; text-align: left; padding: 6px 9px; font-weight: 600; }
+  td { border: 1px solid #e2e8f0; padding: 5px 9px; vertical-align: top; }
+  tr:nth-child(even) td { background: #f8fafc; }
+  pre {
+    background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 6px;
+    padding: 12px 14px; font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 8.3pt; line-height: 1.45; overflow: hidden; white-space: pre;
+    page-break-inside: avoid;
+  }
+  code {
+    font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 9pt;
+    background: #f1f5f9; padding: 1px 4px; border-radius: 3px;
+  }
+  ul, ol { margin: 6px 0; padding-left: 22px; }
+  li { margin: 3px 0; }
+  .callout {
+    background: #fef2f2; border-left: 4px solid #dc2626; border-radius: 4px;
+    padding: 10px 14px; margin: 10px 0; page-break-inside: avoid;
+  }
+  .callout-title { font-weight: 700; color: #dc2626; margin-bottom: 4px; }
+  .flow {
+    background: #f0fdfa; border-left: 4px solid #0f766e; border-radius: 4px;
+    padding: 10px 14px; margin: 10px 0; page-break-inside: avoid;
+  }
+  .flow-title { font-weight: 700; color: #0f766e; margin-bottom: 4px; }
+  .pagebreak { page-break-before: always; }
+  .footer-note { margin-top: 30px; font-size: 8.5pt; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 8px; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Belia Hub</h1>
+  <p class="subtitle">System Architecture Report</p>
+  <p class="meta">
+    Platform digital organisasi belia — pengurusan keahlian &amp; marketplace servis ·
+    Zero-Cost Serverless Deployment · Dokumen rujukan: ARCHITECTURE.md, FUNCTIONAL_SPEC.md, DATABASE.md ·
+    Dijana: 27 Julai 2026
+  </p>
+</div>
+
+<h2>1. High-Level Architecture</h2>
+<pre>
+┌───────────────────────────────────────────────────────────────┐
+│                       Client (Browser)                        │
+│                React 18 + Inertia.js + Tailwind               │
+└──────────────────────────────┬────────────────────────────────┘
+                               │ HTTPS
+┌──────────────────────────────▼────────────────────────────────┐
+│                     Vercel (Serverless PHP)                    │
+│                 Laravel 11 (PHP 8.2+, vercel-php)              │
+│  Breeze Auth │ Controllers (thin) │ Service Classes │ Jobs*    │
+└───────┬──────────────┬──────────────┬──────────────┬──────────┘
+        │              │              │              │
+┌───────▼──────┐ ┌─────▼───────┐ ┌────▼───────┐ ┌────▼──────────┐
+│ MySQL (Aiven)│ │Cloudflare R2│ │ Brevo SMTP │ │GitHub Actions │
+│   Database   │ │File Storage │ │   Email    │ │    CI/CD      │
+└──────────────┘ └─────────────┘ └────────────┘ └───────────────┘
+</pre>
+<p>* Jobs run synchronously or via Vercel cron (see Serverless Constraints).</p>
+
+<h2>2. Tech Stack</h2>
+<table>
+  <tr><th>Layer</th><th>Technology</th><th>Notes</th></tr>
+  <tr><td>Backend</td><td>Laravel 11.x, PHP 8.2+</td><td><code>declare(strict_types=1);</code> everywhere</td></tr>
+  <tr><td>Frontend</td><td>React 18 + Inertia.js</td><td>Functional components + hooks only</td></tr>
+  <tr><td>Styling</td><td>Tailwind CSS</td><td>—</td></tr>
+  <tr><td>Auth</td><td>Laravel Breeze (React stack)</td><td>Session-based</td></tr>
+  <tr><td>Database</td><td>MySQL on Aiven (DBaaS)</td><td>SSL connection required</td></tr>
+  <tr><td>Runtime</td><td>Vercel serverless (<code>vercel-php</code>)</td><td>Ephemeral, read-only filesystem</td></tr>
+  <tr><td>File storage</td><td>Cloudflare R2</td><td>Via Laravel <code>Storage::disk('s3')</code></td></tr>
+  <tr><td>Email</td><td>Brevo SMTP (prod), Mailtrap (dev)</td><td>—</td></tr>
+  <tr><td>CI/CD</td><td>GitHub Actions → Vercel</td><td>Lint, test, deploy</td></tr>
+</table>
+
+<h2>3. Serverless Constraints (CRITICAL)</h2>
+<div class="callout">
+  <div class="callout-title">Vercel's filesystem is ephemeral and read-only — non-negotiable rules</div>
+  <ol>
+    <li><strong>NEVER</strong> save user uploads with <code>storage_path()</code> or <code>public_path()</code>.</li>
+    <li><strong>ALWAYS</strong> use <code>Storage::disk('s3')</code> (Cloudflare R2) for all uploads: reference materials, delivery files, invoices, QR images.</li>
+    <li><strong>NO</strong> long-running <code>queue:work</code> daemons. Priority order: synchronous processing (<code>QUEUE_CONNECTION=sync</code>) for emails/PDFs; Vercel cron jobs hitting a signed artisan endpoint for scheduled tasks.</li>
+    <li>Cache/session drivers: use <code>database</code> or <code>cookie</code>, never <code>file</code>.</li>
+    <li>Compiled views: pre-compile at build time or point <code>view.compiled</code> at <code>/tmp</code>.</li>
+    <li>Logs: <code>LOG_CHANNEL=stderr</code> (Vercel captures stdout/stderr).</li>
+  </ol>
+</div>
+
+<h2>4. Application Layers</h2>
+<pre>
+Route → Middleware (auth, role) → Controller (thin)
+      → FormRequest (validation)
+      → Service class (business logic)
+      → Eloquent Model (data)
+      → Inertia::render(...) / redirect
+</pre>
+<ul>
+  <li><strong>Controllers:</strong> thin, no business logic. One resource controller per module.</li>
+  <li><strong>FormRequests:</strong> ALL validation lives here. Authorization checks per role.</li>
+  <li><strong>Service classes:</strong> <code>app/Services/</code> — e.g. <code>SequenceService</code>, <code>OrderService</code>, <code>InvoiceService</code>, <code>AttendanceService</code>.</li>
+  <li><strong>Eloquent only:</strong> no raw SQL. Relationships defined on models.</li>
+</ul>
+
+<h2>5. RBAC Design</h2>
+<p>Four roles stored on <code>users.role</code> (enum): <code>superadmin</code>, <code>provider</code>, <code>member</code>, <code>client</code> (default for new registrations).</p>
+<ul>
+  <li>Middleware: <code>role:superadmin</code>, <code>role:superadmin,provider</code> etc.</li>
+  <li>Policies for record-level checks (e.g. user can only view own orders; provider can only update assigned orders).</li>
+</ul>
+<table>
+  <tr><th>Route group</th><th>Access</th></tr>
+  <tr><td><code>/</code>, <code>/servis</code>, <code>/terma</code>, <code>/privasi</code></td><td>Public (landing, catalog, terms, privacy)</td></tr>
+  <tr><td><code>/admin/*</code></td><td>Superadmin</td></tr>
+  <tr><td><code>/provider/*</code></td><td>Provider (+ superadmin)</td></tr>
+  <tr><td><code>/dashboard</code>, <code>/orders</code></td><td>All authenticated verified users (members AND clients)</td></tr>
+  <tr><td><code>/events</code>, attendance endpoints</td><td>Members/providers only (clients blocked)</td></tr>
+</table>
+<p><strong>Membership upgrade path:</strong> <code>client</code> applies → superadmin approves → role <code>member</code> + <code>BH-</code> ID generated.</p>
+
+<div class="pagebreak"></div>
+
+<h2>6. Planned Directory Structure (key paths)</h2>
+<pre>
+app/
+  Enums/            UserRole, OrderStatus, PaymentType, FileCategory,
+                    EventStatus, SequenceType
+  Http/
+    Controllers/    Admin/, Provider/, Member/
+    Middleware/     EnsureUserHasRole.php, EnsureUserIsActive.php
+    Requests/       one FormRequest per action
+  Models/           User, Skill, Service, ServiceOrder, OrderFile, OrderComment,
+                    Payment, Payout, Invoice, Event, Attendance, Sequence
+  Policies/
+  Services/         SequenceService (membership/order/invoice IDs),
+                    OrderService, InvoiceService (invoice + receipt PDFs),
+                    AttendanceService, R2UploadService
+resources/js/
+  Layouts/          AuthenticatedLayout, AdminLayout, GuestLayout
+  Pages/            Admin/, Provider/, Member/, Auth/
+  Components/
+routes/             web.php, auth.php
+database/           migrations/, seeders/, factories/
+docs/               documentation
+vercel.json         Vercel runtime config
+</pre>
+
+<h2>7. Environment Variables</h2>
+<pre>
+APP_KEY, APP_URL
+APP_TIMEZONE=Asia/Kuala_Lumpur   (critical: attendance windows & payment dates;
+                                  Vercel defaults to UTC)
+DB_HOST, DB_PORT, DB_DATABASE, DB_USERNAME, DB_PASSWORD  (Aiven, MYSQL_ATTR_SSL_CA)
+AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY                 (R2 keys)
+AWS_DEFAULT_REGION=auto
+AWS_BUCKET, AWS_ENDPOINT, AWS_USE_PATH_STYLE_ENDPOINT=true
+MAIL_MAILER=smtp, MAIL_HOST (Brevo), MAIL_PORT, MAIL_USERNAME, MAIL_PASSWORD
+QUEUE_CONNECTION=sync
+SESSION_DRIVER=database
+CACHE_STORE=database
+LOG_CHANNEL=stderr
+ORG_BANK_NAME, ORG_BANK_ACCOUNT_NO, ORG_BANK_ACCOUNT_NAME  (payment instructions
+                                                            shown to clients)
+</pre>
+<p>App-level settings live in <code>config/beliahub.php</code>: locality list (dropdown options), stale-order threshold (14 days), attendance grace period, file upload limits.</p>
+
+<h2>8. CI/CD Pipeline (GitHub Actions)</h2>
+<ol>
+  <li><strong>On PR:</strong> <code>composer install</code> → Pint (lint) → PHPUnit/Pest tests → <code>npm run build</code> check.</li>
+  <li><strong>On merge to <code>main</code>:</strong> Vercel auto-deploy (Git integration) or <code>vercel deploy --prod</code> step.</li>
+  <li>Migrations run via deploy hook or manual <code>php artisan migrate --force</code> against Aiven.</li>
+</ol>
+
+<h2>9. Key Flows</h2>
+
+<div class="flow">
+  <div class="flow-title">Registration → Membership (open registration, admin-approved membership)</div>
+  User registers (Breeze, default role <code>client</code>) → email verified → can order services. Optionally applies for membership (at registration or later) → superadmin approves → role upgraded to <code>member</code> → <code>SequenceService</code> generates <code>BH-{YEAR}-{NNNN}</code> (DB transaction + <code>lockForUpdate()</code> on <code>sequences</code> row) → welcome email (BM) sent via Brevo (sync). Clients never get a <code>BH-</code> ID and cannot access events.
+</div>
+
+<div class="flow">
+  <div class="flow-title">Service Order (money in: client → organization)</div>
+  Member/client picks service from catalog (types &amp; prices managed by superadmin; order stores unit price snapshot + quantity) → order created <code>pending</code> with <code>total = unit_price × quantity</code>, <code>deposit = total × 0.5</code> → client uploads reference files + payment proof → R2 → superadmin verifies proof, records deposit payment (receipt PDF auto-emailed), confirms + assigns provider → invoice PDF → R2 → emailed to client → client/provider communicate via order comment thread → provider uploads delivery files, marks <code>completed</code> → superadmin records balance payment.
+</div>
+
+<div class="flow">
+  <div class="flow-title">Payout (money out: organization → provider)</div>
+  Order completed &amp; fully paid → superadmin records payout to assigned provider (manual amount, method, date) → provider views own payout history. Dashboard reports gross collection − refunds − payouts = net revenue.
+</div>
+
+<div class="flow">
+  <div class="flow-title">Event Attendance (rotating QR)</div>
+  Superadmin creates event → during event, admin opens "Display QR" page showing a short-lived signed URL QR (~5 min validity, auto-refreshes) → member scans → hits signed + throttled endpoint → attendance row created (unique per user+event, within event time window).
+</div>
+
+<p class="footer-note">
+  Belia Hub — System Architecture Report · Sumber: docs/ARCHITECTURE.md ·
+  Rujuk docs/FUNCTIONAL_SPEC.md untuk spesifikasi modul dan docs/DATABASE.md untuk skema pangkalan data.
+</p>
+
+</body>
+</html>
