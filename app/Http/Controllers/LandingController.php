@@ -41,6 +41,9 @@ class LandingController extends Controller
             'services' => $services,
             'translations' => __('landing'),
             'heroImageUrl' => $this->resolveHeroImageUrl(),
+            'heroImageFallbackUrl' => $this->resolvePublicImageUrl(
+                (string) config('beliahub.landing.hero_image_fallback', ''),
+            ),
             'heroOverlay' => (float) config('beliahub.landing.hero_overlay', 0.55),
             'stats' => $this->stats(),
             'canLogin' => true,
@@ -59,7 +62,28 @@ class LandingController extends Controller
 
     private function resolveHeroImageUrl(): ?string
     {
-        $image = trim((string) config('beliahub.landing.hero_image', ''));
+        $configured = $this->resolvePublicImageUrl(
+            (string) config('beliahub.landing.hero_image', ''),
+        );
+
+        if ($configured !== null) {
+            return $configured;
+        }
+
+        // Prefer compressed assets if legacy/env path is missing (e.g. old hero.png).
+        foreach (['images/hero.webp', 'images/hero.jpg', 'images/hero.png'] as $candidate) {
+            $url = $this->resolvePublicImageUrl($candidate);
+            if ($url !== null) {
+                return $url;
+            }
+        }
+
+        return null;
+    }
+
+    private function resolvePublicImageUrl(string $image): ?string
+    {
+        $image = trim($image);
 
         if ($image === '') {
             return null;

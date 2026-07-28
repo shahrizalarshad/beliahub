@@ -36,7 +36,7 @@ function BackgroundMusic({ src }) {
 
     return (
         <>
-            <audio ref={audioRef} src={src} loop preload="auto" />
+            <audio ref={audioRef} src={src} loop preload="none" />
             <button
                 type="button"
                 onClick={toggle}
@@ -113,12 +113,14 @@ export default function Landing({
     services,
     translations: t,
     heroImageUrl = null,
+    heroImageFallbackUrl = null,
     heroOverlay = 0.55,
     stats = {},
 }) {
     const orderHref = auth?.user ? route('dashboard') : route('register');
     const membershipHref = auth?.user ? route('dashboard') : route('register');
     const catalogHref = route('services.catalog');
+    const [heroLoaded, setHeroLoaded] = useState(false);
 
     const features = [
         { key: 'marketplace', ...t.features.marketplace },
@@ -140,11 +142,24 @@ export default function Landing({
     ];
 
     const hasHeroImage = Boolean(heroImageUrl);
+    const heroSrc = heroImageFallbackUrl || heroImageUrl;
 
     return (
         <PublicLayout auth={auth} t={t}>
             <Head title={t.meta.title}>
                 <meta name="description" content={t.meta.description} />
+                {heroImageUrl && (
+                    <link
+                        rel="preload"
+                        as="image"
+                        href={heroImageUrl}
+                        type={
+                            heroImageUrl.endsWith('.webp')
+                                ? 'image/webp'
+                                : undefined
+                        }
+                    />
+                )}
             </Head>
 
             <BackgroundMusic src="/music/AUD-20260722-WA0024.mp3" />
@@ -153,17 +168,30 @@ export default function Landing({
             <section
                 className={
                     hasHeroImage
-                        ? 'relative min-h-[70vh] overflow-hidden text-white sm:min-h-[75vh]'
+                        ? 'relative min-h-[70vh] overflow-hidden bg-emerald-800 text-white sm:min-h-[75vh]'
                         : 'relative overflow-hidden bg-gradient-to-br from-emerald-700 via-emerald-600 to-teal-700 text-white'
                 }
             >
                 {hasHeroImage ? (
                     <>
-                        <img
-                            src={heroImageUrl}
-                            alt=""
-                            className="absolute inset-0 h-full w-full object-cover"
-                        />
+                        <picture>
+                            {heroImageUrl.endsWith('.webp') && (
+                                <source
+                                    srcSet={heroImageUrl}
+                                    type="image/webp"
+                                />
+                            )}
+                            <img
+                                src={heroSrc}
+                                alt=""
+                                fetchPriority="high"
+                                decoding="async"
+                                onLoad={() => setHeroLoaded(true)}
+                                className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${
+                                    heroLoaded ? 'opacity-100' : 'opacity-0'
+                                }`}
+                            />
+                        </picture>
                         <div
                             className="absolute inset-0 bg-slate-950"
                             style={{ opacity: heroOverlay }}

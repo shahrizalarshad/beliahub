@@ -5,8 +5,9 @@ declare(strict_types=1);
 return [
 
     'landing' => [
-        'hero_image' => env('LANDING_HERO_IMAGE', 'images/hero.png'),
+        'hero_image' => env('LANDING_HERO_IMAGE', 'images/hero.webp'),
         'hero_overlay' => (float) env('LANDING_HERO_OVERLAY', 0.55),
+        'hero_image_fallback' => env('LANDING_HERO_IMAGE_FALLBACK', 'images/hero.jpg'),
     ],
 
     'localities' => [

@@ -1,0 +1,1 @@
+import{r as a,j as n}from"./app-SaLQ3HdA.js";import{B as m}from"./button-BV26GsNN.js";const f=a.forwardRef(function({className:r="",children:t,...o},s){return n.jsx(m,{ref:s,className:r,...o,children:t})});export{f as P};
