@@ -31,6 +31,10 @@
             "dest": "/public/favicon.ico"
         },
         {
+            "src": "/favicon.png",
+            "dest": "/public/favicon.png"
+        },
+        {
             "src": "/robots.txt",
             "dest": "/public/robots.txt"
         },
