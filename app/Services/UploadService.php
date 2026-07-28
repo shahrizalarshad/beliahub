@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Enums\FileCategory;
+use App\Models\Event;
 use App\Models\OrderFile;
 use App\Models\ServiceOrder;
 use App\Models\User;
@@ -36,6 +37,30 @@ class UploadService
             'size' => $file->getSize(),
             'mime_type' => $file->getMimeType() ?? 'application/octet-stream',
         ]);
+    }
+
+    public function storeEventPoster(Event $event, UploadedFile $file): string
+    {
+        $disk = StorageDisk::uploads();
+        $filename = Str::uuid()->toString().'.'.$file->getClientOriginalExtension();
+        $path = "events/{$event->id}/poster/{$filename}";
+
+        Storage::disk($disk)->put($path, $file->get());
+
+        return $path;
+    }
+
+    public function deleteIfExists(?string $path): void
+    {
+        if ($path === null || $path === '') {
+            return;
+        }
+
+        $disk = Storage::disk(StorageDisk::uploads());
+
+        if ($disk->exists($path)) {
+            $disk->delete($path);
+        }
     }
 
     public function temporaryUrl(string $path, int $minutes = 30): ?string

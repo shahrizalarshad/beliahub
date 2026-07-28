@@ -16,13 +16,6 @@ class OrderFileController extends Controller
 
     public function store(StoreOrderFileRequest $request, ServiceOrder $order): RedirectResponse
     {
-        abort_unless(
-            $order->user_id === $request->user()->id
-            || $request->user()->isSuperadmin()
-            || $order->provider_id === $request->user()->id,
-            403,
-        );
-
         $this->uploads->storeOrderFile(
             $order,
             $request->user(),

@@ -74,6 +74,9 @@ export default function Show({
     comments = [],
     paymentInfo = {},
     files = {},
+    canUpload = {},
+    showPaymentInstructions = false,
+    viewer = {},
 }) {
     const commentForm = useForm({ body: '' });
 
@@ -86,7 +89,12 @@ export default function Show({
 
     const cancelOrder = () => router.post(route('orders.cancel', order.id));
 
-    const canCancel = order.status === 'pending';
+    const referenceTitle = viewer.is_client
+        ? 'Rujukan (anda)'
+        : 'Rujukan (pelanggan)';
+    const deliveryTitle = viewer.is_provider
+        ? 'Penghantaran (anda)'
+        : 'Penghantaran (petugas)';
 
     return (
         <AuthenticatedLayout
@@ -135,28 +143,54 @@ export default function Show({
 
                             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                                 <h3 className="font-semibold text-slate-900">Fail</h3>
-                                <FileList
-                                    files={files.reference}
-                                    title="Rujukan (anda)"
-                                />
-                                <FileUpload
-                                    orderId={order.id}
-                                    category="reference"
-                                    label="Muat naik fail rujukan"
-                                />
-                                <FileList
-                                    files={files.payment_proof}
-                                    title="Bukti Bayaran"
-                                />
-                                <FileUpload
-                                    orderId={order.id}
-                                    category="payment_proof"
-                                    label="Muat naik bukti bayaran"
-                                />
-                                <FileList
-                                    files={files.delivery}
-                                    title="Penghantaran (petugas)"
-                                />
+                                {(canUpload.reference ||
+                                    files.reference?.length > 0) && (
+                                    <>
+                                        <FileList
+                                            files={files.reference}
+                                            title={referenceTitle}
+                                        />
+                                        {canUpload.reference && (
+                                            <FileUpload
+                                                orderId={order.id}
+                                                category="reference"
+                                                label="Muat naik fail rujukan"
+                                            />
+                                        )}
+                                    </>
+                                )}
+                                {(canUpload.payment_proof ||
+                                    files.payment_proof?.length > 0) && (
+                                    <>
+                                        <FileList
+                                            files={files.payment_proof}
+                                            title="Bukti Bayaran"
+                                        />
+                                        {canUpload.payment_proof && (
+                                            <FileUpload
+                                                orderId={order.id}
+                                                category="payment_proof"
+                                                label="Muat naik bukti bayaran"
+                                            />
+                                        )}
+                                    </>
+                                )}
+                                {(canUpload.delivery ||
+                                    files.delivery?.length > 0) && (
+                                    <>
+                                        <FileList
+                                            files={files.delivery}
+                                            title={deliveryTitle}
+                                        />
+                                        {canUpload.delivery && (
+                                            <FileUpload
+                                                orderId={order.id}
+                                                category="delivery"
+                                                label="Muat naik fail penghantaran"
+                                            />
+                                        )}
+                                    </>
+                                )}
                             </div>
 
                             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -224,9 +258,13 @@ export default function Show({
                                 }
                             />
 
-                            <PaymentInstructionCard paymentInfo={paymentInfo} />
+                            {showPaymentInstructions && (
+                                <PaymentInstructionCard
+                                    paymentInfo={paymentInfo}
+                                />
+                            )}
 
-                            {canCancel && (
+                            {order.can_cancel && (
                                 <ConfirmDialog
                                     trigger={
                                         <SecondaryButton

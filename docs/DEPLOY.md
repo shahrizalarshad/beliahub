@@ -157,13 +157,23 @@ vercel env pull .env.production.local
 php artisan migrate --force
 ```
 
+### Seed data pertama kali (production)
+
+Selepas migrasi pertama, seed skill, servis, dan superadmin — **jangan** guna `DatabaseSeeder` penuh (ada `DemoUserSeeder` untuk local sahaja):
+
+```bash
+php artisan db:seed --class=ProductionSeeder --force
+```
+
+Pastikan env `SUPERADMIN_EMAIL`, `SUPERADMIN_NAME`, dan `SUPERADMIN_PASSWORD` diset dalam Vercel sebelum seed.
+
 ## 7. CI/CD Pipeline
 
 ```
 PR / push → GitHub Actions:
   ├── composer install
   ├── npm ci && npm run build
-  ├── composer test (46 tests)
+  ├── composer test (55 tests)
   └── pint --test (lint)
 
 push main → tambahan:
@@ -171,7 +181,18 @@ push main → tambahan:
   └── Vercel auto-deploy (Git integration)
 ```
 
+**Production URL:** https://beliahub.vercel.app
+
 ## 8. Semak Selepas Deploy
+
+Jalankan smoke test automatik:
+
+```bash
+chmod +x scripts/smoke-production.sh
+./scripts/smoke-production.sh https://beliahub.vercel.app
+```
+
+Checklist manual (perlu ujian dengan akaun sebenar):
 
 - [ ] `/` — landing page
 - [ ] `/login` — log masuk

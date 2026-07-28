@@ -78,12 +78,7 @@ class OrderController extends Controller
 
     public function show(Request $request, ServiceOrder $order): Response
     {
-        abort_unless(
-            $order->user_id === $request->user()->id
-            || $order->provider_id === $request->user()->id
-            || $request->user()->isSuperadmin(),
-            403,
-        );
+        abort_unless($order->viewerCanAccess($request->user()), 403);
 
         $order->load(['service', 'files', 'comments.author']);
 
@@ -96,6 +91,9 @@ class OrderController extends Controller
             ])->values());
 
         $bank = config('beliahub.bank');
+
+        $user = $request->user();
+        $canUpload = $order->uploadPermissionsFor($user);
 
         return Inertia::render('Orders/Show', [
             'order' => [
@@ -110,6 +108,13 @@ class OrderController extends Controller
                 'paid_formatted' => 'RM'.number_format($order->paidAmount(), 2),
                 'balance_formatted' => 'RM'.number_format($order->balanceDue(), 2),
                 'requirements' => $order->requirements,
+                'can_cancel' => $order->user_id === $user->id && $order->status === OrderStatus::Pending,
+            ],
+            'canUpload' => $canUpload,
+            'showPaymentInstructions' => $order->user_id === $user->id,
+            'viewer' => [
+                'is_client' => $order->user_id === $user->id,
+                'is_provider' => $order->provider_id === $user->id,
             ],
             'comments' => $order->comments->map(fn ($comment) => [
                 'id' => $comment->id,

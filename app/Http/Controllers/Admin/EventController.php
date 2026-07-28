@@ -9,16 +9,22 @@ use App\Http\Controllers\Controller;
 use App\Models\Attendance;
 use App\Models\Event;
 use App\Services\AttendanceService;
+use App\Services\UploadService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Throwable;
 
 class EventController extends Controller
 {
+    public function __construct(private readonly UploadService $uploads) {}
+
     public function index(): Response
     {
         $events = Event::query()->withCount('attendances')->latest('starts_at')->paginate(15);
@@ -43,12 +49,17 @@ class EventController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $data = $this->validated($request);
-        Event::create([
+        $data = $this->eventAttributes($request);
+
+        $event = Event::create([
             ...$data,
             'status' => EventStatus::from($data['status']),
             'created_by' => $request->user()->id,
         ]);
+
+        if ($request->hasFile('poster')) {
+            $this->syncPoster($event, $request->file('poster'));
+        }
 
         return redirect()->route('admin.events.index')->with('success', __('events.created'));
     }
@@ -64,18 +75,29 @@ class EventController extends Controller
                 'starts_at' => $event->starts_at->format('Y-m-d\TH:i'),
                 'ends_at' => $event->ends_at->format('Y-m-d\TH:i'),
                 'budget' => $event->budget,
+                'actual_spend' => $event->actual_spend,
                 'status' => $event->status->value,
+                'poster_url' => $event->poster_path
+                    ? $this->uploads->temporaryUrl($event->poster_path)
+                    : null,
             ],
         ]);
     }
 
     public function update(Request $request, Event $event): RedirectResponse
     {
-        $data = $this->validated($request);
+        $data = $this->eventAttributes($request);
+
         $event->update([
             ...$data,
             'status' => EventStatus::from($data['status']),
         ]);
+
+        if ($request->boolean('remove_poster')) {
+            $this->removePoster($event);
+        } elseif ($request->hasFile('poster')) {
+            $this->syncPoster($event, $request->file('poster'), replace: true);
+        }
 
         return redirect()->route('admin.events.index')->with('success', __('events.updated'));
     }
@@ -145,6 +167,14 @@ class EventController extends Controller
         ]);
     }
 
+    private function eventAttributes(Request $request): array
+    {
+        $data = $this->validated($request);
+        unset($data['poster'], $data['remove_poster']);
+
+        return $data;
+    }
+
     private function validated(Request $request): array
     {
         return $request->validate([
@@ -154,7 +184,41 @@ class EventController extends Controller
             'starts_at' => ['required', 'date'],
             'ends_at' => ['required', 'date', 'after:starts_at'],
             'budget' => ['nullable', 'numeric', 'min:0'],
+            'actual_spend' => ['nullable', 'numeric', 'min:0'],
             'status' => ['required', 'in:draft,published,done'],
+            'poster' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'remove_poster' => ['sometimes', 'boolean'],
+        ], [
+            'poster.image' => __('events.poster_invalid'),
+            'poster.mimes' => __('events.poster_invalid'),
+            'poster.max' => __('events.poster_too_large'),
         ]);
+    }
+
+    private function syncPoster(Event $event, UploadedFile $file, bool $replace = false): void
+    {
+        try {
+            if ($replace) {
+                $this->removePoster($event, persist: false);
+            }
+
+            $event->update([
+                'poster_path' => $this->uploads->storeEventPoster($event, $file),
+            ]);
+        } catch (Throwable $e) {
+            Log::error('Event poster upload failed', [
+                'event_id' => $event->id,
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    private function removePoster(Event $event, bool $persist = true): void
+    {
+        $this->uploads->deleteIfExists($event->poster_path);
+
+        if ($persist) {
+            $event->update(['poster_path' => null]);
+        }
     }
 }

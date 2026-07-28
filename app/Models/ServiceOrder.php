@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\FileCategory;
 use App\Enums\OrderStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -102,5 +103,43 @@ class ServiceOrder extends Model
         return $this->status === OrderStatus::Pending
             && $this->created_at->lt(now()->subDays($days))
             && $this->paidAmount() <= 0;
+    }
+
+    public function viewerCanAccess(User $user): bool
+    {
+        return $this->user_id === $user->id
+            || $user->isSuperadmin()
+            || $this->provider_id === $user->id;
+    }
+
+    /** @return array<string, bool> */
+    public function uploadPermissionsFor(User $user): array
+    {
+        if (! $this->viewerCanAccess($user)) {
+            return [
+                FileCategory::Reference->value => false,
+                FileCategory::PaymentProof->value => false,
+                FileCategory::Delivery->value => false,
+            ];
+        }
+
+        if ($user->isSuperadmin()) {
+            return [
+                FileCategory::Reference->value => true,
+                FileCategory::PaymentProof->value => true,
+                FileCategory::Delivery->value => true,
+            ];
+        }
+
+        return [
+            FileCategory::Reference->value => $this->user_id === $user->id,
+            FileCategory::PaymentProof->value => $this->user_id === $user->id,
+            FileCategory::Delivery->value => $this->provider_id === $user->id,
+        ];
+    }
+
+    public function userCanUploadCategory(User $user, string $category): bool
+    {
+        return $this->uploadPermissionsFor($user)[$category] ?? false;
     }
 }
