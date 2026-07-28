@@ -1,1 +1,0 @@
-import{j as s}from"./app-DMan6RMC.js";function o({name:e="",url:t=null,className:r="h-8 w-8 text-sm"}){return t?s.jsx("img",{src:t,alt:e,className:`rounded-full object-cover ${r}`}):s.jsx("span",{className:`flex items-center justify-center rounded-full bg-emerald-600 font-bold text-white ${r}`,children:e.charAt(0).toUpperCase()})}export{o as A};

@@ -1,6 +1,70 @@
 import { BriefcaseIcon } from '@/Components/Icons';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { Head, Link } from '@inertiajs/react';
+import { useEffect, useRef, useState } from 'react';
+
+function BackgroundMusic({ src }) {
+    const audioRef = useRef(null);
+    const [isPlaying, setIsPlaying] = useState(false);
+
+    useEffect(() => {
+        const audio = audioRef.current;
+        if (!audio) return;
+
+        // Kebanyakan pelayar sekat autoplay bunyi tanpa interaksi pengguna,
+        // jadi kita cuba mainkan terus dan fallback kepada butang jika disekat.
+        audio
+            .play()
+            .then(() => setIsPlaying(true))
+            .catch(() => setIsPlaying(false));
+    }, []);
+
+    const toggle = () => {
+        const audio = audioRef.current;
+        if (!audio) return;
+
+        if (isPlaying) {
+            audio.pause();
+            setIsPlaying(false);
+        } else {
+            audio
+                .play()
+                .then(() => setIsPlaying(true))
+                .catch(() => setIsPlaying(false));
+        }
+    };
+
+    return (
+        <>
+            <audio ref={audioRef} src={src} loop preload="auto" />
+            <button
+                type="button"
+                onClick={toggle}
+                aria-label={isPlaying ? 'Jeda muzik' : 'Mainkan muzik'}
+                className="fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-600 text-white shadow-lg transition hover:bg-emerald-700"
+            >
+                {isPlaying ? (
+                    <svg
+                        className="h-5 w-5"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <rect x="6" y="5" width="4" height="14" rx="1" />
+                        <rect x="14" y="5" width="4" height="14" rx="1" />
+                    </svg>
+                ) : (
+                    <svg
+                        className="h-5 w-5 translate-x-0.5"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path d="M7 5.5v13a1 1 0 001.5.87l11-6.5a1 1 0 000-1.74l-11-6.5A1 1 0 007 5.5z" />
+                    </svg>
+                )}
+            </button>
+        </>
+    );
+}
 
 function FeatureIcon({ type }) {
     const icons = {
@@ -82,6 +146,8 @@ export default function Landing({
             <Head title={t.meta.title}>
                 <meta name="description" content={t.meta.description} />
             </Head>
+
+            <BackgroundMusic src="/music/AUD-20260722-WA0024.mp3" />
 
             {/* Hero — full-bleed background image when configured */}
             <section
