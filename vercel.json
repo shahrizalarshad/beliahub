@@ -23,6 +23,10 @@
             "dest": "/public/images/$1"
         },
         {
+            "src": "/music/(.*)",
+            "dest": "/public/music/$1"
+        },
+        {
             "src": "/favicon.ico",
             "dest": "/public/favicon.ico"
         },
