@@ -45,7 +45,7 @@ function SidebarContent({ onNavigate = () => {} }) {
                     className="flex items-center gap-2.5"
                     onClick={onNavigate}
                 >
-                    <ApplicationLogo className="h-8 w-auto fill-current text-emerald-400" />
+                    <ApplicationLogo className="h-8 w-8 text-emerald-500" />
                     <span className="text-base font-bold tracking-tight text-white">
                         Belia Hub
                         <span className="ms-2 rounded bg-emerald-500/20 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-300">

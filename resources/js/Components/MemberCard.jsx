@@ -36,8 +36,8 @@ export default function MemberCard({ member, qrSvg }) {
 
             <div className="relative flex items-start justify-between gap-4">
                 <div className="flex items-center gap-3">
-                    <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/15 backdrop-blur">
-                        <ApplicationLogo className="h-7 w-auto fill-current text-white" />
+                    <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-sm">
+                        <ApplicationLogo className="h-8 w-8 text-emerald-600" />
                     </span>
                     <div>
                         <p className="text-base font-bold leading-tight tracking-tight">

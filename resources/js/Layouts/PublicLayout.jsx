@@ -7,7 +7,7 @@ export default function PublicLayout({ auth, t, children }) {
             <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
                 <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
                     <Link href="/" className="flex items-center gap-3">
-                        <ApplicationLogo className="h-9 w-9" />
+                        <ApplicationLogo className="h-9 w-9 text-emerald-600" />
                         <span className="text-lg font-bold tracking-tight text-slate-900">
                             {t.nav.brand}
                         </span>
@@ -63,7 +63,7 @@ export default function PublicLayout({ auth, t, children }) {
                     <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
                         <div className="max-w-md">
                             <div className="flex items-center gap-3">
-                                <ApplicationLogo className="h-8 w-8" />
+                                <ApplicationLogo className="h-8 w-8 text-emerald-400" />
                                 <span className="text-lg font-bold text-white">
                                     {t.nav.brand}
                                 </span>

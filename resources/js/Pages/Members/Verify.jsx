@@ -20,7 +20,7 @@ export default function Verify({ member = null }) {
             <Head title="Semakan Keahlian" />
 
             <Link href="/" className="mb-8 flex items-center gap-2">
-                <ApplicationLogo className="h-9 w-auto fill-current text-emerald-700" />
+                <ApplicationLogo className="h-9 w-9 text-emerald-700" />
                 <span className="text-lg font-bold tracking-tight text-slate-900">
                     Belia Hub
                 </span>

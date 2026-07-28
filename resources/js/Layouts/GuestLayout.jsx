@@ -10,7 +10,7 @@ export default function GuestLayout({ children }) {
 
             <div>
                 <Link href="/" className="flex flex-col items-center gap-2">
-                    <ApplicationLogo className="h-16 w-16 fill-current text-primary" />
+                    <ApplicationLogo className="h-16 w-16 text-emerald-600" />
                     <span className="text-lg font-bold tracking-tight text-foreground">
                         Belia Hub
                     </span>

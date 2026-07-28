@@ -60,7 +60,7 @@ export default function AuthenticatedLayout({ header, children }) {
                         <div className="flex">
                             <div className="flex shrink-0 items-center gap-2">
                                 <Link href="/" className="flex items-center gap-2">
-                                    <ApplicationLogo className="block h-8 w-auto fill-current text-emerald-700" />
+                                    <ApplicationLogo className="block h-8 w-8 text-emerald-700" />
                                     <span className="hidden text-base font-bold tracking-tight text-slate-900 sm:inline">
                                         Belia Hub
                                     </span>
